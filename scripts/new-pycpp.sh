@@ -116,8 +116,10 @@ sed -i 's/"pybind11>=3"/"nanobind>=3.1"/' pyproject.toml
 
 sed -i 's|^build-dir = "build/{wheel_tag}"$|# A persistent build dir keeps rebuilds incremental (a temporary one rebuilds everything)\
 build-dir = "build/{wheel_tag}"\
-# Optimized, with symbols so py-spy can name C++ frames (`just build` strips the wheel)\
+# Optimized, with symbols so py-spy can name C++ frames (`just build` strips the wheel).\
+# -O3 like Rust'"'"'s release profile (CMake'"'"'s RelWithDebInfo default is -O2)\
 cmake.build-type = "RelWithDebInfo"\
+cmake.define.CMAKE_CXX_FLAGS_RELWITHDEBINFO = "-O3 -g -DNDEBUG"\
 install.strip = false\
 # Stable ABI wheel tag ('"$cp_tag"'-abi3), matching STABLE_ABI in CMakeLists.txt\
 wheel.py-api = "'"$cp_tag"'"\

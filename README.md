@@ -240,8 +240,8 @@ That runs these steps:
    as the build backend, so uv asks it for an **editable** build (PEP 660).
    scikit-build-core then:
    - runs CMake and Ninja in `build/cp313-abi3-linux_x86_64/`
-     (`build-dir = "build/{wheel_tag}"`), in `RelWithDebInfo` mode, with
-     `BUILD_TESTING=OFF`
+     (`build-dir = "build/{wheel_tag}"`), in `RelWithDebInfo` mode
+     (`-O3 -g`), with `BUILD_TESTING=OFF`
    - builds the `factor` library and the `_core` extension against the
      stable ABI (`STABLE_ABI` in `CMakeLists.txt`, `wheel.py-api = "cp313"`:
      one binary for every Python ≥ 3.13)
@@ -331,8 +331,9 @@ What this project adds to uv's scikit-build template:
 - **[`pyproject.toml`](pyproject.toml):** `[tool.ruff]`, `[tool.mypy]`
   (strict, covering `src/python_cpp`, `tests` and `examples`) and
   `[tool.pytest.ini_options]`. `[tool.scikit-build]` gets
-  `cmake.build-type = "RelWithDebInfo"` and `install.strip = false` (symbols
-  for py-spy), `wheel.py-api = "cp313"` (stable ABI tag) and
+  `cmake.build-type = "RelWithDebInfo"` with `-O3` instead of CMake's
+  default `-O2` (as optimized as Rust's release profile) and
+  `install.strip = false` (symbols for py-spy), `wheel.py-api = "cp313"` (stable ABI tag) and
   `BUILD_TESTING=OFF`. `[tool.uv]` gets `no-build-isolation-package` (see
   above). `[build-system]` requires nanobind instead of pybind11. The
   template already has `build-dir` and `cache-keys` covering the C++ files.
@@ -432,7 +433,8 @@ To activate automatically in every terminal, add to `~/.bashrc`:
 ## Performance notes
 
 - **Builds are already optimized.** The editable build uses
-  `RelWithDebInfo` (`-O2 -g`), so benchmark directly:
+  `RelWithDebInfo` with `-O3 -g` (optimized, with symbols for py-spy), so
+  benchmark directly:
 
   ```bash
   uv run python examples/do_factorize.py 10000000000000061   # a 17-digit prime, ~0.5 s
@@ -444,8 +446,22 @@ To activate automatically in every terminal, add to `~/.bashrc`:
   form of the factor loop (`d <= n / d` plus `n % d`) to two 64-bit divisions
   per step, where Rust's LLVM backend uses one; that made it 2× slower than
   the Rust version. `factor.cpp` now derives the remainder from the
-  quotient, and is within about 10% of Rust (LLVM also switches to a faster
-  32-bit division when the values fit, which GCC doesn't).
+  quotient, so each step costs one division.
+- **Compared with the Rust version.** Both spend almost all their time in
+  the CPU's 64-bit division, one per odd candidate. Best of three
+  alternating runs on an Intel i7-8550U, timing the `factor` call alone:
+
+  | Prime | Rust | C++ (`-O3`) |
+  |---|---|---|
+  | 17 digits (10¹⁶ + 61) | 0.357 s | 0.360 s (+1%) |
+  | Largest below 2⁶⁴ (2⁶⁴ − 59, ~2.1 billion divisions) | 15.8 s | 16.2 s (+3%) |
+
+  With CMake's default `RelWithDebInfo` flags (`-O2`), C++ was about 7%
+  slower.
+- **Keep hot code out of `core.cpp`.** `nanobind_add_module` compiles the
+  module's own sources with `-Os` (smallest size), which overrides `-O3`.
+  That suits binding code, but heavy work belongs in a separate library like
+  `factor`, which gets `-O3`. (nanobind's `NOMINSIZE` option turns `-Os` off.)
 - **Crossing the boundary costs.** Converting a large Python list to a
   `std::vector` copies every element. C++ pays off when it does real work
   per item, or with NumPy arrays via `nb::ndarray` (zero-copy).
