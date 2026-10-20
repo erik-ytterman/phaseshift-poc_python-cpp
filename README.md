@@ -103,6 +103,8 @@ phaseshift-poc_python-cpp/
 ├── tests/                  pytest tests (test_*.py)
 │   └── cpp/                C++ tests (doctest)
 ├── examples/               runnable demos
+├── .github/workflows/
+│   └── ci.yml              runs `just check` on push and pull requests
 └── scripts/
     └── new-pycpp.sh        scaffolds a new project like this one
 ```
@@ -345,6 +347,9 @@ What this project adds to uv's scikit-build template:
 - **[`activate.sh`](activate.sh):** see the next section.
 - **[`.gitignore`](.gitignore):** `profile.svg` and tool caches. The
   template already covers `build/` and `dist/`.
+
+- **[`.github/workflows/ci.yml`](.github/workflows/ci.yml):** runs
+  `uv run just check` on every push to `main` and on pull requests.
 
 Keep `uv.lock` committed.
 

@@ -1,0 +1,18 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      # The C++ compiler is the runner's own g++; everything else comes from uv
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      # Installs Python, the dev tools (including CMake, Ninja and just) and builds the extension
+      - run: uv run just check
