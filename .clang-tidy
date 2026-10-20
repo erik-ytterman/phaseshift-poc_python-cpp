@@ -6,4 +6,5 @@ Checks: >
   readability-braces-around-statements,
   readability-implicit-bool-conversion
 WarningsAsErrors: '*'
-HeaderFilterRegex: '^src/'
+# Matched against absolute paths: this project's headers, not nanobind's or doctest's
+HeaderFilterRegex: '/(src|tests)/.*\.hpp$'
