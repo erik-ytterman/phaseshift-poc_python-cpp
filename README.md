@@ -8,7 +8,8 @@ clang-format, clang-tidy, CMake, Ninja, auditwheel and
 [just](https://just.systems) are installed as project dev tools.
 
 It has the same functionality and Python API as its Rust twin,
-`phaseshift-poc_python-native`, and passes the same Python tests.
+[`phaseshift-poc_python-rust`](https://github.com/erik-ytterman/phaseshift-poc_python-rust),
+and passes the same Python tests.
 
 The distribution name is `python-cpp`; the import name is `python_cpp`.
 
