@@ -57,5 +57,5 @@ build:
 # Configure and build the plain CMake tree (Debug, with tests, warnings as errors)
 _cmake:
     uv run cmake -S . -B {{cmake_build}} -G Ninja -DCMAKE_BUILD_TYPE=Debug \
-        -DCMAKE_COMPILE_WARNING_AS_ERROR=ON
+        -DWARNINGS_AS_ERRORS=ON
     uv run cmake --build {{cmake_build}}

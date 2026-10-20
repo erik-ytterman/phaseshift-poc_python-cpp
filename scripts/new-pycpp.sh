@@ -65,8 +65,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # compile_commands.json, read by clang-tidy
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Warnings are fatal only in \`just lint\`/\`just test\` (CMAKE_COMPILE_WARNING_AS_ERROR)
+# Warnings for this project's targets only. They are fatal in \`just lint\`/\`just test\`,
+# which turn on WARNINGS_AS_ERRORS, but not for nanobind's own sources
 set(warnings -Wall -Wextra -Wpedantic)
+option(WARNINGS_AS_ERRORS "Make compiler warnings in this project's code errors" OFF)
+if(WARNINGS_AS_ERRORS)
+    list(APPEND warnings -Werror)
+endif()
 
 # The extension module. Development.SABIModule and STABLE_ABI build against the
 # stable ABI (abi3): one binary for every Python >= $python_version (matches requires-python)
