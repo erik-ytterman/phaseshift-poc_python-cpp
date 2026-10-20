@@ -34,7 +34,7 @@ test: _cmake
     uv run ctest --test-dir {{cmake_build}} --output-on-failure
     uv run pytest
 
-# Remove all build artifacts and the venv
+# Remove build output, caches and the venv
 clean:
     rm -rf .venv build dist .mypy_cache .ruff_cache .pytest_cache
     rm -f profile.svg

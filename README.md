@@ -271,7 +271,12 @@ code, edits show up without reinstalling. That is also how `examples/` and
 | C++ files, `CMakeLists.txt` | Next `uv run` or `uv sync` (rebuilds on change) |
 
 Unlike maturin, scikit-build-core doesn't put the compiled `.so` into
-`src/`, so there's nothing to gitignore there. It only works with the
+`src/`, so there's nothing to gitignore there.
+
+uv also caches the editable wheel, `.so` included. When the venv is
+recreated (e.g. after `just clean`) and no source file changed, uv
+reinstalls that wheel without compiling. To force a full rebuild, run
+`uv sync --reinstall-package python-cpp`. It only works with the
 venv's Python: a system `python3` gives `ModuleNotFoundError`.
 
 ### Building a wheel for distribution
@@ -406,6 +411,7 @@ To activate automatically in every terminal, add to `~/.bashrc`:
    ```bash
    deactivate
    uv run just clean
+   uv sync --reinstall-package python-cpp   # compile, not reuse uv's cached build
    uv run just check && uv run just build
    ```
 
