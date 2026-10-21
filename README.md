@@ -104,8 +104,9 @@ phaseshift-poc_python-cpp/
 ├── tests/                  pytest tests (test_*.py)
 │   └── cpp/                C++ tests (doctest)
 ├── examples/               runnable demos
-├── .github/workflows/
-│   └── ci.yml              runs `just check` on push and pull requests
+├── .github/
+│   ├── workflows/ci.yml    runs `just check` on push and pull requests
+│   └── dependabot.yml      weekly PRs that update the CI actions
 └── scripts/
     └── new-pycpp.sh        scaffolds a new project like this one
 ```
@@ -361,7 +362,11 @@ What this project adds to uv's scikit-build template:
   template already covers `build/` and `dist/`.
 
 - **[`.github/workflows/ci.yml`](.github/workflows/ci.yml):** runs
-  `uv run just check` on every push to `main` and on pull requests.
+  `uv run just check` on every push to `main` and on pull requests. Its
+  actions are pinned by commit hash, with the version in a comment.
+- **[`.github/dependabot.yml`](.github/dependabot.yml):** Dependabot checks
+  the actions weekly and opens one PR with any updates (new hash and
+  version comment), which CI then tests.
 
 Keep `uv.lock` committed.
 
