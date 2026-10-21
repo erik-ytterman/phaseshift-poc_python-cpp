@@ -17,7 +17,8 @@ The distribution name is `python-cpp`; the import name is `python_cpp`.
 
 ## Prerequisites
 
-Only uv and a C++23 compiler are needed (tested with GCC 13.3). Everything
+Only uv and a C++23 compiler are needed (tested with GCC 13.3, 14.2 and 15.2,
+glibc 2.39 and 2.43). Everything
 else, including CMake, Ninja, the clang tools and `just`, is installed by uv
 into the project venv.
 
@@ -143,7 +144,12 @@ NB_MODULE(_core, m) {
 }
 ```
 
-and a test in [`tests/cpp/test_factor.cpp`](tests/cpp/test_factor.cpp):
+Include the nanobind headers before any standard header: they include
+`Python.h`, which [must come first](https://docs.python.org/3/c-api/intro.html#include-files).
+Otherwise newer glibc versions (2.43+) make `pyconfig.h` redefine
+`_POSIX_C_SOURCE`, which `-Werror` turns into a build failure.
+
+Add a test in [`tests/cpp/test_factor.cpp`](tests/cpp/test_factor.cpp):
 
 ```cpp
 TEST_CASE("factors") {
@@ -290,16 +296,19 @@ venv's Python: a system `python3` gives `ModuleNotFoundError`.
    tagged `cp313-abi3-linux_x86_64`, which PyPI and pip on other machines
    don't accept as portable.
 2. `auditwheel repair` checks which system libraries and symbol versions
-   the `.so` needs and retags it, here
+   the `.so` needs and retags it, e.g.
    `python_cpp-0.1.0-cp313-abi3-manylinux_2_34_x86_64.whl` in `dist/`.
-   (maturin does this step itself.)
+   The `manylinux_2_XX` part is the build machine's glibc version or
+   lower, so build on an old system (or in a manylinux container) for a
+   wheel that installs on more systems. (maturin does this step itself.)
 
 Unlike the editable wheel, it contains the package itself (`__init__.py`,
 `_core.abi3.so`, `_core.pyi`, `py.typed`), with no link back to your source.
 It doesn't touch `.venv`.
 
 Install it in any environment with Python ≥ 3.13 on the same platform
-(here Linux x86_64, glibc ≥ 2.34). No compiler is needed there:
+(here Linux x86_64, glibc ≥ the version in the tag). No compiler is needed
+there:
 
 ```bash
 uv pip install dist/python_cpp-*.whl   # or: pip install ...
@@ -340,7 +349,9 @@ What this project adds to uv's scikit-build template:
 - **[`CMakeLists.txt`](CMakeLists.txt):** replaced. C++23, warnings,
   `compile_commands.json` for clang-tidy, the `factor` library, the nanobind
   extension, and the doctest-based C++ tests. doctest is a single header,
-  downloaded at configure time and checked against its SHA-256.
+  downloaded at configure time and checked against its SHA-256. C++ module
+  scanning is off (`CMAKE_CXX_SCAN_FOR_MODULES`): with GCC ≥ 14 it adds
+  GCC-only flags to `compile_commands.json` that clang-tidy rejects.
 - **[`.clang-format`](.clang-format), [`.clang-tidy`](.clang-tidy):** C++
   style (LLVM, 4 spaces, 100 columns) and lint checks (bugprone,
   performance, modernize), all warnings errors.

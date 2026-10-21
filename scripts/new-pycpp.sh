@@ -62,6 +62,9 @@ project($module LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+# No C++ modules here. Scanning for them (CMake's default with GCC >= 14) adds
+# GCC-only flags to compile_commands.json that clang-tidy rejects
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 # compile_commands.json, read by clang-tidy
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -92,10 +95,11 @@ EOF
 cat >src/core.cpp <<EOF
 // A Python module implemented in C++. The name in NB_MODULE must match the
 // target name in CMakeLists.txt, else Python will not be able to import it.
-#include <string_view>
-
+// nanobind includes Python.h, which must come before any standard header
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/string_view.h>
+
+#include <string_view>
 
 namespace nb = nanobind;
 

@@ -1,5 +1,14 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+// Under clang (clang-tidy), doctest includes <ciso646>, which libstdc++ >= 15
+// flags with a #warning in C++20 and later
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-W#warnings"
+#endif
 #include <doctest/doctest.h>
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 #include <cstdint>
 #include <limits>

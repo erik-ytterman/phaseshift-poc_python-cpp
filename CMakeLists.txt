@@ -4,6 +4,9 @@ project(python_cpp LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+# No C++ modules here. Scanning for them (CMake's default with GCC >= 14) adds
+# GCC-only flags to compile_commands.json that clang-tidy rejects
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 # compile_commands.json, read by clang-tidy
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 

@@ -1,13 +1,14 @@
 // A Python module implemented in C++. The name in NB_MODULE must match the
 // target name in CMakeLists.txt, else Python will not be able to import it.
+// nanobind includes Python.h, which must come before any standard header
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/string_view.h>
+#include <nanobind/stl/vector.h>
+
 #include <cstdint>
 #include <limits>
 #include <string_view>
 #include <vector>
-
-#include <nanobind/nanobind.h>
-#include <nanobind/stl/string_view.h>
-#include <nanobind/stl/vector.h>
 
 #include "factor.hpp"
 
