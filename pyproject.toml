@@ -1,6 +1,6 @@
 [project]
 name = "python-cpp"
-version = "0.1.0"
+version = "0.2.0"
 description = "Proof of concept: a Python package with a native C++23 core (nanobind + scikit-build-core)"
 readme = "README.md"
 authors = [

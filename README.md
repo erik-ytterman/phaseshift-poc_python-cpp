@@ -329,7 +329,7 @@ venv's Python: a system `python3` gives `ModuleNotFoundError`.
    don't accept as portable.
 2. `auditwheel repair` checks which system libraries and symbol versions
    the `.so` needs and retags it, e.g.
-   `python_cpp-0.1.0-cp313-abi3-manylinux_2_34_x86_64.whl` in `dist/`.
+   `python_cpp-0.2.0-cp313-abi3-manylinux_2_34_x86_64.whl` in `dist/`.
    The `manylinux_2_XX` part is the build machine's glibc version or
    lower, so build on an old system (or in a manylinux container) for a
    wheel that installs on more systems. (maturin does this step itself.)
