@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       # The C++ compiler is the runner's own g++; everything else comes from uv
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           enable-cache: true
       # Installs Python, the dev tools (including CMake, Ninja and just) and builds the extension
