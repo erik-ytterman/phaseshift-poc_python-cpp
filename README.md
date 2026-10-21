@@ -357,7 +357,8 @@ What this project adds to uv's scikit-build template:
   style (LLVM, 4 spaces, 100 columns) and lint checks (bugprone,
   performance, modernize), all warnings errors.
 - **[`justfile`](justfile):** the recipes above.
-- **[`activate.sh`](activate.sh):** see the next section.
+- **[`activate.sh`](activate.sh):** see
+  [Activating the venv and `just` completion](#activating-the-venv-and-just-completion).
 - **[`.gitignore`](.gitignore):** `profile.svg` and tool caches. The
   template already covers `build/` and `dist/`.
 
@@ -373,6 +374,47 @@ Keep `uv.lock` committed.
 Why nanobind rather than pybind11 (which the uv template uses): pybind11
 can't build against the stable ABI, so it needs one wheel per Python
 version. nanobind gives one abi3 wheel, as PyO3 does.
+
+### Finding GitHub Actions and their versions
+
+Each `uses: <owner>/<repo>@<ref>` line in a workflow names a GitHub
+repository, `https://github.com/<owner>/<repo>`, and the version of it to
+run. For example, `actions/checkout` is
+[github.com/actions/checkout](https://github.com/actions/checkout). That
+repository holds the action's documentation:
+
+- **README:** usage examples and the inputs it accepts (the `with:` keys).
+  `action.yml` in the repository root defines those inputs and their
+  defaults.
+- **Releases page** (`https://github.com/<owner>/<repo>/releases`): every
+  version, with release notes that list breaking changes. Read them before
+  moving to a new major version.
+- **[GitHub Marketplace](https://github.com/marketplace?type=actions):**
+  search for actions; each listing links to its repository.
+
+`<ref>` can be a major-version tag (`@v7`, moved by the maintainer to each
+new v7.x release; not every action publishes these), an exact tag
+(`@v7.0.1`), or a commit hash. This repo pins hashes, which never change,
+and puts the version in a comment. GitHub's
+[security guide](https://docs.github.com/en/actions/reference/security/secure-use#using-third-party-actions)
+recommends that. From the terminal:
+
+```bash
+gh release list -R actions/checkout --limit 5             # newest versions
+gh release view v7.0.1 -R actions/checkout                # release notes
+gh api repos/actions/checkout/git/ref/tags/v7.0.1 -q .object.sha   # hash to pin
+```
+
+If the last command's `.object.type` is `tag` rather than `commit`, the tag
+is annotated: look up that object with
+`gh api repos/<owner>/<repo>/git/tags/<sha> -q .object.sha` to get the
+commit. Dependabot (see above) does all of this weekly and opens a PR.
+
+The workflow syntax itself (`on:`, `jobs:`, `runs-on:`, `steps:`) is
+documented in GitHub's
+[workflow syntax reference](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax),
+and the runner images (what `ubuntu-latest` contains, such as its GCC
+version) in [actions/runner-images](https://github.com/actions/runner-images).
 
 ---
 
