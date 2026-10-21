@@ -20,7 +20,8 @@ The distribution name is `python-cpp`; the import name is `python_cpp`.
 Only uv and a C++23 compiler are needed (tested with GCC 13.3, 14.2 and 15.2,
 glibc 2.39 and 2.43). Everything
 else, including CMake, Ninja, the clang tools and `just`, is installed by uv
-into the project venv.
+into the project venv. CI tests Ubuntu 24.04 (GCC 13) and 26.04 (GCC 15)
+with Python 3.13, 3.14 and 3.15.
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -105,7 +106,7 @@ phaseshift-poc_python-cpp/
 │   └── cpp/                C++ tests (doctest)
 ├── examples/               runnable demos
 ├── .github/
-│   ├── workflows/ci.yml    runs `just check` on push and pull requests
+│   ├── workflows/ci.yml    runs `just check` and `just build` on push and PRs
 │   └── dependabot.yml      weekly PRs that update the CI actions
 └── scripts/
     └── new-pycpp.sh        scaffolds a new project like this one
@@ -363,8 +364,11 @@ What this project adds to uv's scikit-build template:
   template already covers `build/` and `dist/`.
 
 - **[`.github/workflows/ci.yml`](.github/workflows/ci.yml):** runs
-  `uv run just check` on every push to `main` and on pull requests. Its
-  actions are pinned by commit hash, with the version in a comment.
+  `uv run just check` and `uv run just build` on every push to `main` and
+  on pull requests, on Ubuntu 24.04 and 26.04 with Python 3.13, 3.14 and
+  3.15 (setup-uv's `python-version` overrides `.python-version`). The C++
+  compiler is the runner's own `g++`. The actions are pinned by commit
+  hash, with the version in a comment.
 - **[`.github/dependabot.yml`](.github/dependabot.yml):** Dependabot checks
   the actions weekly and opens one PR with any updates (new hash and
   version comment), which CI then tests.
@@ -413,7 +417,7 @@ commit. Dependabot (see above) does all of this weekly and opens a PR.
 The workflow syntax itself (`on:`, `jobs:`, `runs-on:`, `steps:`) is
 documented in GitHub's
 [workflow syntax reference](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax),
-and the runner images (what `ubuntu-latest` contains, such as its GCC
+and the runner images (what `ubuntu-24.04` contains, such as its GCC
 version) in [actions/runner-images](https://github.com/actions/runner-images).
 
 ---

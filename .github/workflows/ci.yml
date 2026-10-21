@@ -7,12 +7,22 @@ on:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    name: ${{ matrix.os }}, Python ${{ matrix.python }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-26.04]
+        python: ["3.13", "3.14", "3.15"]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      # The C++ compiler is the runner's own g++; everything else comes from uv
+      # The C++ compiler is the runner's own g++ (GCC 13 on 24.04, 15 on 26.04);
+      # everything else comes from uv
       - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           enable-cache: true
+          # Sets UV_PYTHON, which overrides .python-version
+          python-version: ${{ matrix.python }}
       # Installs Python, the dev tools (including CMake, Ninja and just) and builds the extension
       - run: uv run just check
+      - run: uv run just build
