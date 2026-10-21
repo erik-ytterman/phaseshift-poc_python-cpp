@@ -81,6 +81,36 @@ Requirements: uv, a C++ compiler and git, and GNU `sed` (Linux). Run the
 script from a checkout of this repo, since that is where it copies the four
 files from; the current directory doesn't matter.
 
+Example, creating `fast-math` next to this repo:
+
+```bash
+cd ~/Work
+phaseshift-poc_python-cpp/scripts/new-pycpp.sh --python 3.13 fast-math
+# ... uv output, then `just check` builds, lints and tests it, ending with:
+# Created fast-math. Next: cd fast-math && source ./activate.sh
+```
+
+```
+fast-math/
+├── pyproject.toml  uv.lock  .python-version  CMakeLists.txt
+├── justfile  activate.sh  .clang-format  .clang-tidy  .gitignore  README.md
+├── src/
+│   ├── core.cpp            NB_MODULE(_core, m) with hello_from_bin()
+│   └── fast_math/
+│       ├── __init__.py     hello() wraps _core.hello_from_bin()
+│       ├── _core.pyi
+│       └── py.typed
+└── tests/test_smoke.py
+```
+
+```bash
+cd fast-math && source ./activate.sh
+python -c "import fast_math; print(fast_math.hello())"   # Hello from fast-math!
+```
+
+From there, add functions as in [Adding a native function](#adding-a-native-function).
+The CI files in `.github/` are not copied; copy them by hand if you want them.
+
 ---
 
 ## Project layout
