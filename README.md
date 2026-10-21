@@ -68,7 +68,8 @@ scripts/new-pycpp.sh --python 3.14 my-pkg ~/x   # Python version (default 3.13),
 It starts from `uv init --lib --build-backend scikit`, replaces the
 template's pybind11 code with nanobind, adds the dev tools and the
 configuration described below, copies `justfile`, `activate.sh`,
-`.clang-format` and `.clang-tidy` from this repo, and finishes with
+`.clang-format`, `.clang-tidy` and the CI files in `.github/` from this repo
+(dropping CI Python versions older than `--python`), and finishes with
 `just check`. The result is standalone, with its own venv and git repo and no
 reference to this repo; later changes here don't affect it. It has no C++
 tests yet (`ctest` reports "No tests were found" and passes).
@@ -94,6 +95,7 @@ phaseshift-poc_python-cpp/scripts/new-pycpp.sh --python 3.13 fast-math
 fast-math/
 ├── pyproject.toml  uv.lock  .python-version  CMakeLists.txt
 ├── justfile  activate.sh  .clang-format  .clang-tidy  .gitignore  README.md
+├── .github/                ci.yml and dependabot.yml, as in this repo
 ├── src/
 │   ├── core.cpp            NB_MODULE(_core, m) with hello_from_bin()
 │   └── fast_math/
@@ -109,7 +111,6 @@ python -c "import fast_math; print(fast_math.hello())"   # Hello from fast-math!
 ```
 
 From there, add functions as in [Adding a native function](#adding-a-native-function).
-The CI files in `.github/` are not copied; copy them by hand if you want them.
 
 ---
 
