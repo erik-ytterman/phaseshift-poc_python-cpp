@@ -18,9 +18,8 @@ The distribution name is `python-cpp`; the import name is `python_cpp`.
 ## Prerequisites
 
 Only uv and a C++23 compiler are needed (tested with GCC 13.3, 14.2 and 15.2,
-glibc 2.39 and 2.43). Everything
-else, including CMake, Ninja, the clang tools and `just`, is installed by uv
-into the project venv. CI tests Ubuntu 24.04 (GCC 13) and 26.04 (GCC 15)
+glibc 2.39 and 2.43). Everything else, including CMake, Ninja, the clang
+tools and `just`, is installed by uv into the project venv. CI tests Ubuntu 24.04 (GCC 13) and 26.04 (GCC 15)
 with Python 3.13, 3.14 and 3.15.
 
 ```bash
@@ -79,7 +78,7 @@ The name must be lowercase letters, digits and single hyphens (e.g.
 The Python version must be 3.12 or later (the stable ABI build needs it).
 
 Requirements: uv, a C++ compiler and git, and GNU `sed` (Linux). Run the
-script from a checkout of this repo, since that is where it copies the four
+script from a checkout of this repo, since that is where it copies those
 files from; the current directory doesn't matter.
 
 Example, creating `fast-math` next to this repo:
@@ -393,7 +392,6 @@ What this project adds to uv's scikit-build template:
   [Activating the venv and `just` completion](#activating-the-venv-and-just-completion).
 - **[`.gitignore`](.gitignore):** `profile.svg` and tool caches. The
   template already covers `build/` and `dist/`.
-
 - **[`.github/workflows/ci.yml`](.github/workflows/ci.yml):** runs
   `uv run just check` and `uv run just build` on every push to `main` and
   on pull requests, on Ubuntu 24.04 and 26.04 with Python 3.13, 3.14 and
@@ -409,6 +407,14 @@ Keep `uv.lock` committed.
 Why nanobind rather than pybind11 (which the uv template uses): pybind11
 can't build against the stable ABI, so it needs one wheel per Python
 version. nanobind gives one abi3 wheel, as PyO3 does.
+
+---
+
+## Working with GitHub
+
+CI runs on GitHub Actions, with the files described under
+[Configuration](#configuration). This section explains how to find the
+actions it uses, and how to work with GitHub from the terminal.
 
 ### Finding GitHub Actions and their versions
 
@@ -443,7 +449,8 @@ gh api repos/actions/checkout/git/ref/tags/v7.0.1 -q .object.sha   # hash to pin
 If the last command's `.object.type` is `tag` rather than `commit`, the tag
 is annotated: look up that object with
 `gh api repos/<owner>/<repo>/git/tags/<sha> -q .object.sha` to get the
-commit. Dependabot (see above) does all of this weekly and opens a PR.
+commit. Dependabot (see [Configuration](#configuration)) does all of this weekly
+and opens a PR.
 
 The workflow syntax itself (`on:`, `jobs:`, `runs-on:`, `steps:`) is
 documented in GitHub's
